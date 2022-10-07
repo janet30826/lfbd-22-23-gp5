@@ -1,0 +1,16 @@
+df_baskets = pd.read_parquet("/Users/owner/Documents/Learning-from-big-data/Lecture-2/baskets-s.parquet")
+# calculate weekly item list per shopper 
+def create_baskets(input_purchases):
+    """Calculate an item list of products per shopper per week"""
+    input_origin = input_purchases.copy()
+    input_purchases = (
+        input_purchases.groupby(by=["customer", "week"])
+        .agg({"product": lambda x: list(x), "price":sum})
+        .reset_index(drop=False)
+    )
+    input_purchases = input_purchases.rename(columns={"product": "products"})
+    input_purchases["basket_size"] = input_purchases["products"].apply(len)
+    return input_purchases, input_origin
+
+baskets1, _ = create_baskets(df_baskets)
+baskets1.head(50)
